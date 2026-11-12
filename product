@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestSiswa - Gamified Productivity & Pomodoro</title>
+    <!-- Tailwind CSS untuk styling modern -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quest-item {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-xl font-black shadow-lg shadow-indigo-500/30">⚔️</div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">QuestSiswa</h1>
+                    <p class="text-xs text-slate-400">Gamified School & Habit Tracker</p>
+                </div>
+            </div>
+            <!-- Status Karakter -->
+            <div class="flex items-center gap-4 bg-slate-800/80 border border-slate-700/60 px-4 py-2 rounded-2xl">
+                <div>
+                    <span id="player-title" class="text-xs font-semibold text-indigo-400 block">Petualang Pemula</span>
+                    <span class="text-sm font-bold text-white">Level <span id="player-level">1</span></span>
+                </div>
+                <div class="h-8 w-px bg-slate-700"></div>
+                <div class="w-32">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">EXP</span>
+                        <span id="exp-text" class="text-indigo-300 font-medium">0 / 100</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div id="exp-bar" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Kolom Kiri & Tengah: Misi Belajar -->
+        <section class="lg:col-span-2 space-y-6">
+            
+            <!-- Tambah Misi Baru -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <span>📝</span> Buat Misi Baru (Tanpa Batas)
+                </h2>
+                <form id="quest-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Nama Misi / Tugas</label>
+                            <input type="text" id="quest-title" placeholder="Contoh: PR Biologi Sel..." required
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Mata Pelajaran / Kategori</label>
+                            <select id="quest-subject" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                                <optgroup label="Akademik">
+                                    <option value="Biologi">Biologi 🧬</option>
+                                    <option value="Matematika">Matematika 📐</option>
+                                    <option value="Informatika">Informatika 💻</option>
+                                    <option value="Fisika">Fisika ⚡</option>
+                                    <option value="Kimia">Kimia 🧪</option>
+                                    <option value="B. Indo">B. Indonesia 🇮🇩</option>
+                                    <option value="B. Jawa">B. Jawa ꦗꦮ</option>
+                                    <option value="B. Inggris">B. Inggris 🇬🇧</option>
+                                    <option value="B. Jepang">B. Jepang 🇯🇵</option>
+                                </optgroup>
+                                <optgroup label="Pengembangan & Lainnya">
+                                    <option value="Ekstrakurikuler">Ekstrakurikuler / Organisasi 🏆</option>
+                                    <option value="Wellness">Kebugaran & Kesehatan 💪</option>
+                                    <option value="Ibadah">Ibadah & Spiritual 🤲</option>
+                                    <option value="Lainnya">Lainnya (Kustom) ✨</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-indigo-600/20 transition-all cursor-pointer">
+                            + Tambah Misi (+20 EXP)
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Daftar Misi Aktif -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span>🎯</span> Daftar Misi Aktif
+                    </h2>
+                    <span id="quest-count" class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full font-medium">0 Misi</span>
+                </div>
+                <div id="quest-list" class="space-y-3">
+                    <div class="text-center py-8 text-slate-500 text-sm">
+                        Belum ada misi aktif. Tambahkan misi belajarmu di atas!
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Kolom Kanan: Pengatur Waktu Belajar & Info -->
+        <section class="space-y-6">
+            
+            <!-- Pomodoro Timer -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-32 h-32 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <h2 class="text-lg font-bold text-white mb-2 flex items-center justify-center gap-2">
+                    <span>⏱️</span> Pengatur Waktu Belajar
+                </h2>
+                <p class="text-xs text-slate-400 mb-6">Fokus 25 menit, dapatkan bonus EXP belajar!</p>
+                
+                <div id="timer-display" class="text-5xl font-black text-indigo-400 tracking-wider mb-6 font-mono">
+                    25:00
+                </div>
+
+                <div class="flex justify-center gap-3">
+                    <button id="timer-start" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg shadow-indigo-600/20 cursor-pointer">Mulai</button>
+                    <button id="timer-pause" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">Jeda</button>
+                    <button id="timer-reset" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">Reset</button>
+                </div>
+            </div>
+
+            <!-- Panel Informasi Proyek -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span>💡</span> Informasi Proyek
+                </h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Aplikasi ini digabungkan dalam satu file tunggal yang mencakup struktur web, desain grafis, dan logika interaktif gamifikasi agar sangat mudah diunggah ke GitHub atau dijalankan langsung.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 mt-12 py-6 text-center text-xs text-slate-500">
+        <p>QuestSiswa © 2026 • Proyek Tugas Kelompok Interaktif</p>
+    </footer>
+
+    <!-- JavaScript Terintegrasi -->
+    <script>
+        let currentEXP = 0;
+        let currentLevel = 1;
+        let expTarget = 100;
+        let quests = [
+            { id: 1, title: "Menerapkan Konsep Biologi Sel", subject: "Biologi", completed: false },
+            { id: 2, title: "Latihan Soal Algoritma Informatika", subject: "Informatika", completed: false }
+        ];
+
+        const questForm = document.getElementById('quest-form');
+        const questTitleInput = document.getElementById('quest-title');
+        const questSubjectSelect = document.getElementById('quest-subject');
+        const questListContainer = document.getElementById('quest-list');
+        const questCountSpan = document.getElementById('quest-count');
+        const playerLevelSpan = document.getElementById('player-level');
+        const playerTitleSpan = document.getElementById('player-title');
+        const expTextSpan = document.getElementById('exp-text');
+        const expBarDiv = document.getElementById('exp-bar');
+
+        const titles = {
+            1: "Petualang Pemula 🎒",
+            2: "Pejuang Kelas 📚",
+            3: "Ksatria Akademik ⚔️",
+            4: "Penyihir Pengetahuan 🧙‍♂️",
+            5: "Master Scholar Legendaris 👑"
+        };
+
+        function renderQuests() {
+            questListContainer.innerHTML = '';
+            
+            if (quests.length === 0) {
+                questListContainer.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 text-sm">
+                        Belum ada misi aktif. Tambahkan misi belajarmu di atas!
+                    </div>
+                `;
+                questCountSpan.textContent = '0 Misi';
+                return;
+            }
+
+            questCountSpan.textContent = `${quests.length} Misi`;
+
+            quests.forEach(quest => {
+                const item = document.createElement('div');
+                item.className = `quest-item flex items-center justify-between p-4 rounded-xl border transition-all ${
+                    quest.completed 
+                        ? 'bg-slate-950/50 border-slate-900 opacity-60 line-through text-slate-500' 
+                        : 'bg-slate-950 border-slate-800 text-slate-200 hover:border-slate-700'
+                }`;
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" ${quest.completed ? 'checked' : ''} onclick="toggleQuest(${quest.id})" 
+                            class="w-5 h-5 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-slate-900 cursor-pointer">
+                        <div>
+                            <h4 class="text-sm font-semibold ${quest.completed ? 'text-slate-500' : 'text-white'}">${quest.title}</h4>
+                            <span class="text-[10px] bg-slate-800 text-indigo-300 px-2.5 py-0.5 rounded-full font-medium inline-block mt-1">${quest.subject}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteQuest(${quest.id})" class="text-slate-600 hover:text-red-400 p-1 rounded-lg transition text-sm cursor-pointer" title="Hapus Misi">🗑️</button>
+                `;
+                questListContainer.appendChild(item);
+            });
+        }
+
+        questForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = questTitleInput.value.trim();
+            const subject = questSubjectSelect.value;
+
+            if (!title) return;
+
+            const newQuest = {
+                id: Date.now(),
+                title: title,
+                subject: subject,
+                completed: false
+            };
+
+            quests.push(newQuest);
+            questTitleInput.value = '';
+            renderQuests();
+        });
+
+        window.toggleQuest = function(id) {
+            const quest = quests.find(q => q.id === id);
+            if (quest) {
+                quest.completed = !quest.completed;
+                if (quest.completed) {
+                    addEXP(20);
+                } else {
+                    addEXP(-20);
+                }
+                renderQuests();
+            }
+        }
+
+        window.deleteQuest = function(id) {
+            quests = quests.filter(q => q.id !== id);
+            renderQuests();
+        }
+
+        function addEXP(amount) {
+            currentEXP += amount;
+            if (currentEXP < 0) currentEXP = 0;
+
+            if (currentEXP >= expTarget) {
+                currentEXP -= expTarget;
+                currentLevel++;
+                expTarget += 50;
+                alert(`🎉 SELAMAT! Kamu naik ke Level ${currentLevel}!`);
+            }
+
+            updatePlayerStats();
+        }
+
+        function updatePlayerStats() {
+            playerLevelSpan.textContent = currentLevel;
+            expTextSpan.textContent = `${currentEXP} / ${expTarget}`;
+            const percentage = (currentEXP / expTarget) * 100;
+            expBarDiv.style.width = `${percentage}%`;
+
+            if (titles[currentLevel]) {
+                playerTitleSpan.textContent = titles[currentLevel];
+            } else {
+                playerTitleSpan.textContent = "Grandmaster Pelajar 🌟";
+            }
+        }
+
+        // Pomodoro Timer Logic
+        let timerMinutes = 25;
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let isRunning = false;
+
+        const timerDisplay = document.getElementById('timer-display');
+        const btnStart = document.getElementById('timer-start');
+        const btnPause = document.getElementById('timer-pause');
+        const btnReset = document.getElementById('timer-reset');
+
+        function updateTimerDisplay() {
+            const mins = String(timerMinutes).padStart(2, '0');
+            const secs = String(timerSeconds).padStart(2, '0');
+            timerDisplay.textContent = `${mins}:${secs}`;
+        }
+
+        btnStart.addEventListener('click', () => {
+            if (isRunning) return;
+            isRunning = true;
+
+            timerInterval = setInterval(() => {
+                if (timerSeconds === 0) {
+                    if (timerMinutes === 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        alert("⏰ Waktu Sesi Fokus Selesai! Kamu mendapatkan +30 EXP Belajar.");
+                        addEXP(30);
+                        resetTimerValues();
+                        return;
+                    }
+                    timerMinutes--;
+                    timerSeconds = 59;
+                } else {
+                    timerSeconds--;
+                }
+                updateTimerDisplay();
+            }, 1000);
+        });
+
+        btnPause.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            isRunning = false;
+        });
+
+        btnReset.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            isRunning = false;
+            resetTimerValues();
+            updateTimerDisplay();
+        });
+
+        function resetTimerValues() {
+            timerMinutes = 25;
+            timerSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        renderQuests();
+        updatePlayerStats();
+    </script>
+</body>
+</html>

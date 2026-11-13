@@ -1,0 +1,19 @@
+<!-- Kartu 4: Fitur Kamera / Sensor Foto -->
+        <div class="card">
+            <h1>📸 Jurnal Ekspresi Kamera</h1>
+            <p style="color: var.text-secondary; font-size: 0.9rem; margin-bottom: 15px;">Ambil foto singkat ekspresimu hari ini sebagai kenangan.</p>
+            
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <!-- Kotak Tampilan Kamera -->
+                <video id="webcam" autoplay playsinline width="100%" max-width="300" style="border-radius: 8px; background: #000; display: none;"></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                
+                <!-- Hasil Foto -->
+                <img id="photoResult" alt="Hasil foto akan muncul di sini" style="width: 100%; max-width: 250px; border-radius: 8px; display: none; border: 2px solid var(--primary);">
+
+                <div class="btn-group" style="margin-top: 10px;">
+                    <button id="camBtn" onclick="toggleCamera()">Nyalakan Kamera</button>
+                    <button id="snapBtn" onclick="takeSnapshot()" style="display: none; background-color: #10b981;">Ambil Foto</button>
+                </div>
+            </div>
+        </div>

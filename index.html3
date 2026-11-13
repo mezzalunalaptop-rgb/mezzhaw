@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Multi-Bahasa (HTML + JS + Python)</title>
+    
+    <!-- Pustaka PyScript untuk menjalankan Python di Browser -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Pomodoro Timer Styles */
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 2px;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
+            100% { text-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
+        }
+
+        .timer-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button.secondary {
+            background-color: #334155;
+            color: var(--text);
+        }
+
+        button.secondary:hover {
+            background-color: #475569;
+        }
+
+        /* Python Section Styles */
+        .python-output {
+            background-color: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            font-family: monospace;
+            color: #34d399;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Kartu 1: Pomodoro Timer (JavaScript) -->
+        <div class="card">
+            <h1>⏱️ Pomodoro Fokus (JavaScript)</h1>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="timer-btns">
+                <button id="startBtn" onclick="toggleTimer()">Mulai</button>
+                <button class="secondary" onclick="resetTimer()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Kartu 2: Fitur Python di Browser (PyScript) -->
+        <div class="card">
+            <h1>🐍 Generator Pesan Python (PyScript)</h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Bagian ini diproses langsung menggunakan bahasa Python di dalam browser!</p>
+            <div class="python-output" id="python-box">Memuat modul Python...</div>
+        </div>
+    </div>
+
+    <!-- Skrip Python yang berjalan di Web -->
+    <script type="py">
+        import datetime
+        from pyscript import display
+
+        # Mendapatkan waktu saat ini menggunakan Python
+        waktu_sekarang = datetime.datetime.now().strftime("%H:%M:%S")
+        pesan_python = f"Halo dari Python! Skrip dijalankan pada pukul: {waktu_sekarang}"
+        
+        # Menampilkan hasil ke elemen HTML dengan id 'python-box'
+        display(pesan_python, target="python-box")
+    </script>
+
+    <script>
+        // Logika Pomodoro Timer (JavaScript)
+        let timeLeft = 1500;
+        let timerId = null;
+        let isRunning = false;
+
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerId);
+                startBtn.textContent = 'Mulai';
+                isRunning = false;
+            } else {
+                startBtn.textContent = 'Jeda';
+                isRunning = true;
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDispatch(); // Sederhanakan fungsi update
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerId);
+                        alert('Waktu fokus selesai!');
+                        resetTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            isRunning = false;
+            timeLeft = 1500;
+            startBtn.textContent = 'Mulai';
+            updateTimerDisplay();
+        }
+
+        window.onload = function() {
+            updateTimerDisplay();
+        };
+    </script>
+</body>
+</html>
